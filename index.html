@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Program Boards — Francisco De La Paz</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green: #52b788;
+  --green-dk: #2d6a4f;
+  --orange: #e07a45;
+  --orange-dk: #b5451b;
+  --ink: #f0ece4;
+  --ink2: #c8c4bc;
+  --ink3: #7a7770;
+  --bg: #141412;
+  --bg2: #1c1b18;
+  --bg3: #242320;
+  --bg4: #2a2927;
+  --border: rgba(240,236,228,0.09);
+  --border2: rgba(240,236,228,0.18);
+  --border3: rgba(240,236,228,0.28);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; font-family: 'Syne', sans-serif; background: var(--bg); color: var(--ink); font-size: 16px; }
+
+/* boards base */
+#boards { display: flex; flex-direction: column; height: 100%; }
+
+/* ═══ SPLASH OVERLAY ═══ */
+#splash {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(10,9,8,0.92);
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity 0.3s;
+}
+#splash.hidden { opacity: 0; pointer-events: none; }
+
+.splash-card {
+  background: var(--bg2);
+  border: 1px solid var(--border3);
+  border-radius: 6px;
+  padding: 3.5rem 4rem;
+  max-width: 860px; width: 92%;
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 3.5rem;
+  align-items: center;
+}
+.splash-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(82,183,136,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(82,183,136,0.05) 1px, transparent 1px);
+  background-size: 44px 44px;
+  pointer-events: none;
+}
+.splash-card::after {
+  content: '';
+  position: absolute; inset: 12px;
+  border: 1px solid rgba(82,183,136,0.1);
+  pointer-events: none;
+}
+
+.splash-left {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 1.2rem;
+  border-right: 1px solid var(--border2);
+  padding-right: 3.5rem;
+}
+.mtw-mark {
+  width: 130px; height: 130px;
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+  background: var(--bg3);
+}
+.mtw-mark img {
+  width: 100%; height: 100%;
+  object-fit: contain; padding: 10px;
+}
+.splash-mark-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--ink2);
+  text-align: center; line-height: 1.6;
+}
+.splash-right {
+  display: flex; flex-direction: column;
+  align-items: flex-start;
+}
+.splash-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.78rem; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--green);
+  margin-bottom: 0.75rem;
+}
+.splash-name {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(2.2rem, 4vw, 3rem);
+  color: var(--ink); line-height: 1.1;
+  margin-bottom: 1.4rem;
+}
+.splash-divider {
+  width: 48px; height: 2px;
+  background: var(--green);
+  margin-bottom: 1.4rem;
+}
+.splash-bio {
+  font-size: 1rem; line-height: 1.75;
+  color: var(--ink2); margin-bottom: 1.8rem;
+}
+.splash-degrees {
+  display: flex; gap: 1.4rem;
+  margin-bottom: 2.2rem; flex-wrap: wrap;
+}
+.splash-deg {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--ink2);
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.splash-deg .dot { width: 7px; height: 7px; border-radius: 50%; }
+.dot-g { background: var(--green); }
+.dot-o { background: var(--orange); }
+
+.enter-btn {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.85rem; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--bg); background: var(--green);
+  border: none; padding: 1rem 3rem; border-radius: 3px;
+  cursor: pointer; transition: background 0.2s, transform 0.15s;
+}
+.enter-btn:hover { background: #3da070; transform: translateY(-1px); }
+
+/* ═══ TOPBAR ═══ */
+.topbar {
+  height: 52px; flex-shrink: 0;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border2);
+  padding: 0 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  position: relative;
+}
+.topbar-left { display: flex; align-items: center; gap: 1rem; }
+.topbar-mtw {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.82rem; font-weight: 500; letter-spacing: 0.18em;
+  color: var(--ink); background: var(--green-dk);
+  padding: 0.3rem 0.7rem; border-radius: 3px;
+  border: 1px solid var(--green);
+}
+.topbar-divider { width: 1px; height: 18px; background: var(--border2); }
+.topbar-name {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.82rem; color: var(--ink2); letter-spacing: 0.06em;
+}
+.topbar-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.82rem; color: var(--ink); letter-spacing: 0.2em; text-transform: uppercase;
+  position: absolute; left: 50%; transform: translateX(-50%);
+}
+.topbar-right { display: flex; align-items: center; }
+.topbar-school {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem; color: var(--ink3); letter-spacing: 0.14em; text-transform: uppercase;
+}
+
+/* ═══ TABS ═══ */
+.tabs {
+  height: 48px; flex-shrink: 0;
+  background: var(--bg3);
+  border-bottom: 2px solid var(--green-dk);
+  transition: border-color 0.3s;
+  display: flex; align-items: stretch; padding: 0 2rem;
+}
+.tabs.observe { border-bottom-color: var(--orange-dk); }
+.tab {
+  padding: 0 1.4rem;
+  font-family: 'DM Mono', monospace; font-size: 0.78rem;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink3); cursor: pointer;
+  border-bottom: 2px solid transparent; margin-bottom: -2px;
+  transition: color 0.2s, border-color 0.2s;
+  user-select: none; white-space: nowrap;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.tab:hover { color: var(--ink2); }
+.tab.ag { color: var(--green); border-bottom-color: var(--green); }
+.tab.ao { color: var(--orange); border-bottom-color: var(--orange); }
+.sdot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.sg { background: var(--green); }
+.so { background: var(--orange); }
+
+/* degree panels */
+.degree-panel { display: none; flex-direction: column; flex: 1; overflow: hidden; }
+.degree-panel.active { display: flex; }
+
+/* ═══ HERO ═══ */
+.hero {
+  height: 120px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; border-bottom: 1px solid var(--border2);
+  overflow: hidden; transition: opacity 0.2s;
+}
+.h-dmf { background: linear-gradient(135deg, #0d2a1c 0%, #1e4d35 55%, #0d2a1c 100%); }
+.h-rob { background: linear-gradient(135deg, #0d1c2a 0%, #1e354d 55%, #0d1c2a 100%); }
+.h-ai  { background: linear-gradient(135deg, #2a0f05 0%, #4d200a 55%, #2a0f05 100%); }
+.hero-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(240,236,228,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(240,236,228,0.05) 1px, transparent 1px);
+  background-size: 38px 38px;
+}
+.hero-label {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  color: rgba(240,236,228,0.4); position: relative;
+  letter-spacing: 0.02em;
+}
+
+/* ═══ WORK AREA ═══ */
+.work-area {
+  flex: 1; display: grid;
+  grid-template-columns: 60px 1fr;
+  overflow: hidden; border-top: 1px solid var(--border);
+}
+
+/* side nav */
+.side-nav {
+  background: var(--bg2); border-right: 1px solid var(--border2);
+  display: flex; flex-direction: column;
+  align-items: center; padding: 1.25rem 0; gap: 0.6rem;
+  overflow-y: auto;
+}
+.side-nav::-webkit-scrollbar { width: 0; }
+.onum {
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 1px solid var(--border2); background: transparent; color: var(--ink3);
+  font-family: 'DM Mono', monospace; font-size: 0.82rem;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.18s; flex-shrink: 0;
+}
+.onum:hover { border-color: var(--ink2); color: var(--ink2); }
+.onum.og { background: var(--green-dk); border-color: var(--green); color: #fff; }
+.onum.oo { background: var(--orange-dk); border-color: var(--orange); color: #fff; }
+
+/* obj panel */
+.obj-panel { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+
+.obj-empty {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 1rem;
+}
+.obj-empty-hint {
+  font-family: 'DM Mono', monospace; font-size: 0.85rem;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink3);
+}
+.obj-empty-arrow { font-size: 1rem; color: var(--ink3); opacity: 0.4; }
+
+.obj-view { display: none; flex-direction: column; height: 100%; }
+.obj-view.active { display: flex; }
+
+/* objective header */
+.obj-header {
+  flex-shrink: 0;
+  padding: 1.4rem 2rem 1.25rem;
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border2);
+  display: flex; align-items: flex-start; gap: 1.25rem;
+}
+.obj-header-num {
+  font-family: 'DM Serif Display', serif;
+  font-size: 2.6rem; line-height: 1; flex-shrink: 0; margin-top: 2px;
+}
+.obj-header-num.cg { color: var(--green); }
+.obj-header-num.co { color: var(--orange); }
+.obj-header-label {
+  font-family: 'DM Mono', monospace; font-size: 0.72rem;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink3); margin-bottom: 0.4rem;
+}
+.obj-header-body {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.25rem; line-height: 1.5; color: var(--ink);
+}
+
+/* sub area */
+.sub-area {
+  flex: 1; display: flex; flex-direction: column;
+  padding: 1.5rem 2rem; overflow: hidden;
+}
+.stepper-bar {
+  display: flex; align-items: center; gap: 1rem;
+  margin-bottom: 1.2rem; flex-shrink: 0;
+}
+.stepper-label {
+  font-family: 'DM Mono', monospace; font-size: 0.88rem;
+  letter-spacing: 0.12em; text-transform: uppercase; flex: 1;
+}
+.cg-text { color: var(--green); }
+.co-text { color: var(--orange); }
+
+.pip-row { display: flex; gap: 6px; align-items: center; }
+.pip { width: 8px; height: 8px; border-radius: 50%; background: var(--border2); transition: background 0.2s; }
+.pip.on-g { background: var(--green); }
+.pip.on-o { background: var(--orange); }
+
+.sarrow {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 1px solid var(--border2); background: transparent; color: var(--ink3);
+  font-size: 0.72rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s; flex-shrink: 0;
+}
+.sarrow:hover:not(:disabled) { border-color: var(--green); color: var(--green); }
+.sarrow:disabled { opacity: 0.18; cursor: default; }
+
+.sub-box {
+  flex: 1; background: var(--bg2);
+  border: 1px solid var(--border2); border-radius: 4px;
+  padding: 1.4rem 1.6rem;
+  font-size: 1rem; line-height: 1.75;
+  color: var(--ink2); font-style: italic;
+  overflow-y: auto; min-height: 120px;
+}
+.sub-box::-webkit-scrollbar { width: 4px; }
+.sub-box::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+/* footer */
+footer {
+  height: 36px; flex-shrink: 0;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--ink3);
+  background: var(--bg2); letter-spacing: 0.06em;
+}
+
+
+</style>
+</head>
+<body>
+
+<!-- SPLASH OVERLAY -->
+<div id="splash">
+  <div class="splash-card">
+
+    <!-- LEFT: logo -->
+    <div class="splash-left">
+      <div class="mtw-mark">
+        <img src="logo.png" alt="MTW">
+      </div>
+      <p class="splash-mark-label">Mad Tinker's<br>Workshop</p>
+    </div>
+
+    <!-- RIGHT: content -->
+    <div class="splash-right">
+      <p class="splash-eyebrow">UAT Program Boards</p>
+      <h1 class="splash-name">Francisco De La Paz</h1>
+      <div class="splash-divider"></div>
+      <p class="splash-bio">
+        U.S. Army veteran, maker, and multi-discipline fabricator pursuing three degrees at the University of Advancing Technology. This portfolio documents program objective evidence across Digital Maker &amp; Fabrication, Robotics Engineering, and Artificial Intelligence.
+      </p>
+      <div class="splash-degrees">
+        <span class="splash-deg"><span class="dot dot-g"></span>Digital Maker &amp; Fabrication</span>
+        <span class="splash-deg"><span class="dot dot-g"></span>Robotics Engineering</span>
+        <span class="splash-deg"><span class="dot dot-o"></span>Artificial Intelligence</span>
+      </div>
+      <button class="enter-btn" onclick="enterBoards()">Enter Boards</button>
+    </div>
+
+  </div>
+</div><!-- /splash -->
+
+<!-- ═══════════════════════════════
+     BOARDS
+═══════════════════════════════ -->
+<div id="boards">
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-mtw">MTW</div>
+      <div class="topbar-divider"></div>
+      <span class="topbar-name">Francisco De La Paz</span>
+    </div>
+    <span class="topbar-title">Program Boards</span>
+    <div class="topbar-right">
+      <span class="topbar-school">UAT</span>
+    </div>
+  </div>
+
+  <div class="tabs" id="tab-bar">
+    <div class="tab ag" onclick="sw('dmf')"><span class="sdot sg"></span>Digital Maker &amp; Fabrication</div>
+    <div class="tab"    onclick="sw('rob')"><span class="sdot sg"></span>Robotics Engineering</div>
+    <div class="tab"    onclick="sw('ai')"><span class="sdot so"></span>Artificial Intelligence</div>
+  </div>
+
+  <!-- ── DMF ── -->
+  <div class="degree-panel active" id="panel-dmf">
+    <div class="hero h-dmf" onclick="heroClick('dmf')">
+      <div class="hero-grid"></div>
+      <div class="hero-label">Digital Maker &amp; Fabrication</div>
+    </div>
+    <div class="work-area">
+      <div class="side-nav" id="snav-dmf"></div>
+      <div class="obj-panel" id="opanel-dmf">
+        <div class="obj-empty" id="empty-dmf">
+          <span class="obj-empty-arrow">&#9664;</span>
+          <span class="obj-empty-hint">Select an objective</span>
+        </div>
+        <!-- obj views injected by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ROBOTICS ── -->
+  <div class="degree-panel" id="panel-rob">
+    <div class="hero h-rob" onclick="heroClick('rob')">
+      <div class="hero-grid"></div>
+      <div class="hero-label">Robotics Engineering</div>
+    </div>
+    <div class="work-area">
+      <div class="side-nav" id="snav-rob"></div>
+      <div class="obj-panel" id="opanel-rob">
+        <div class="obj-empty" id="empty-rob">
+          <span class="obj-empty-arrow">&#9664;</span>
+          <span class="obj-empty-hint">Select an objective</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── AI ── -->
+  <div class="degree-panel" id="panel-ai">
+    <div class="hero h-ai" onclick="heroClick('ai')">
+      <div class="hero-grid"></div>
+      <div class="hero-label">Artificial Intelligence</div>
+    </div>
+    <div class="work-area">
+      <div class="side-nav" id="snav-ai"></div>
+      <div class="obj-panel" id="opanel-ai">
+        <div class="obj-empty" id="empty-ai">
+          <span class="obj-empty-arrow">&#9664;</span>
+          <span class="obj-empty-hint">Select an objective</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Francisco De La Paz — Mad Tinker's Workshop — UAT Program Boards</footer>
+
+</div><!-- /boards -->
+
+<script>
+/* ── DATA ── */
+const DATA = {
+  dmf: {
+    col: 'g',
+    objs: [
+      "Using digital and physical tools, engineer and build prototypes that technology patents are then applied for.",
+      "Build physical products while demonstrating technique and safety competency across commonly accepted prototyping devices, maker tools and techniques.",
+      "Produce products that balance form and function while reflecting current and future trends in design and human factors.",
+      "Demonstrate the ability to evaluate material and build technique options during the creation of products and their prototypes.",
+      "Demonstrate the ability to effectively implement embedded systems and fundamental electronics into product builds.",
+      "Place prototypes and builds within the Agile and MVP development frameworks."
+    ]
+  },
+  rob: {
+    col: 'g',
+    objs: [
+      "Design and complete robotic and embedded systems solutions that address real-world situations and challenges.",
+      "Demonstrate embedded microprocessor system and circuit skills.",
+      "Develop mechanical control systems by implementing transducers, actuators, feedback, vision and sensing systems, and other mechanical systems into robotic platforms.",
+      "Examine and assess a variety of applications within the field of robotics.",
+      "Model, analyze, and design systems or processes that integrate hardware and software to control autonomous mechanical systems.",
+      "Implement artificial intelligence and data systems into robotic platforms."
+    ]
+  },
+  ai: {
+    col: 'o',
+    objs: [
+      "Create and integrate cognitive artificial intelligence into applications.",
+      "Create and evolve natural language processing systems.",
+      "Demonstrate proficiency in designing and developing machine learning systems using industry approaches and patterns.",
+      "Design and employ deep learning systems using best practices and conventions.",
+      "Demonstrate a deep understanding of neural networks and their role in creating intelligent systems.",
+      "Design, create, or integrate reinforcement learning, large language models, and genetic algorithms in intelligent software."
+    ]
+  }
+};
+
+const PREFIX = { dmf:'DMF', rob:'ROB', ai:'AI' };
+const SUBS   = ['a','b','c'];
+const DEGS   = ['dmf','rob','ai'];
+
+/* ── SUB-OBJECTIVE DESCRIPTORS
+   Format: SUBS_DEFAULT[degree][objIndex][subIndex]
+   These are the battle plan snapshots — short, honest, specific
+   Replace each string with artifact links as evidence is built
+── */
+const SUBS_DEFAULT = {
+  dmf: [
+    // Obj 1 — prototypes / patents
+    [
+      'NeuroWave Patch — a wearable device concept for nerve pain management based on personal medical experience. Patent spec draft in progress.',
+      'Spectroscope Stand — custom 3-part stand designed and built in-house for a dual spectroscope gem lab setup. No off-the-shelf version exists.',
+      'MindScribe — original AI conversation and profiling system. Designed from scratch, built across multiple semesters. UAT senior project.'
+    ],
+    // Obj 2 — technique and safety across maker tools
+    [
+      'EleksDraw XY Plotter — set up and operated for producing technical drawings. Covers machine operation, pen selection, and paper handling.',
+      'CNC machining and 3D printing at MTW — used regularly for real parts: watch components, gem lab fixtures, and casting patterns.',
+      'Foundry and gem lab work — metal casting and optical instrument construction. Safety procedures followed throughout both disciplines.'
+    ],
+    // Obj 3 — form / function / human factors
+    [
+      'Pen holder and paper platform — designed so the pen hits the paper at the right angle with the right pressure. Every dimension has a reason.',
+      'NeuroWave Patch — designed to be worn on the body. Material choices, size, and interaction method were all driven by the user experience.',
+      'Custom watch builds — six timepieces designed for specific people. Dial readability, case size, and comfort were all part of the design process.'
+    ],
+    // Obj 4 — material and technique evaluation
+    [
+      'Pen holder material choice — compared rigid PETG vs flexible TPU. Chose based on which gave more consistent ink pressure on the paper.',
+      'Drawing surface testing — compared vellum, Bristol board, copy paper, and Mylar. Chose vellum because it meets patent drawing standards.',
+      'Tool comparison — Cricut vs Silhouette vs EleksDraw. Wrote up which tool fits which job and why, based on hands-on testing.'
+    ],
+    // Obj 5 — embedded systems and electronics
+    [
+      'EleksDraw setup — configured the motion controller settings for speed, acceleration, and pen lift. Used Universal Gcode Sender to tune and test.',
+      'MindScribe on Raspberry Pi 5 with AI HAT+ 2 — running an AI system on a small computer with a dedicated AI chip. No cloud required.',
+      'PCB design in KiCad and Arduino motor projects — designed a circuit board from scratch and built motor control circuits for coursework.'
+    ],
+    // Obj 6 — Agile / MVP frameworks
+    [
+      'MindScribe rebuild — lost the codebase with no backup. Rebuilt starting with the most important parts first, adding features one at a time.',
+      'EleksDraw pipeline — built in steps. Made the pen holder, tested it, fixed what was wrong, then moved to the next piece.',
+      'MTW shop management — running multiple active projects across different disciplines at the same time. Prioritize what ships first.'
+    ]
+  ],
+  rob: [
+    // Obj 1 — real-world robotic solutions
+    [
+      'EleksDraw set up as an automated drawing machine — takes a design file and draws it on paper without manual input. Real task, real output.',
+      'Full pipeline from AI design to physical drawing — MindScribe creates the image, software converts it, EleksDraw draws it. End to end.',
+      'Webcam for job completion detection — camera watches the drawing surface and sends a notification when the print is done. Status: planned.'
+    ],
+    // Obj 2 — embedded microprocessor and circuits
+    [
+      'EleksDraw motion controller — configured speed, acceleration, and pen lift settings directly in the firmware using a serial interface.',
+      'Arduino motor control project (RBT205) — wired and programmed a motor driver circuit to control speed and direction. Coursework artifact.',
+      'PCB design (KiCad) — drew a complete circuit board schematic, assigned components, and ran design checks before sending to fabrication.'
+    ],
+    // Obj 3 — mechanical control, actuators, feedback, vision, sensing
+    [
+      'EleksDraw X and Y motors — two stepper motors move the pen across the drawing surface. Spring-loaded pen holder keeps pressure consistent.',
+      'Pen lift servo — a small servo motor raises and lowers the pen on command. Limit switches tell the machine where home position is.',
+      'Webcam vision — camera will watch the drawing and detect when it is finished, then trigger a notification. Status: planned build.'
+    ],
+    // Obj 4 — assess robotics applications
+    [
+      'Cricut vs Silhouette vs EleksDraw — wrote a comparison of all three machines. Looked at how each is controlled, what it does well, and where it falls short.',
+      'EleksDraw fit for patent drawings — evaluated whether this machine could produce drawings that meet USPTO standards. Documented the findings.',
+      'Drone training program application — applied to the Wounded Warrior Drone Program. Connected military survey skills to commercial inspection work.'
+    ],
+    // Obj 5 — hardware/software autonomous systems
+    [
+      'Complete drawing pipeline — design comes from MindScribe, gets converted to machine instructions, and EleksDraw executes it. Software talks to hardware.',
+      'Two-link robot arm project — calculated the math for how a two-joint arm moves and built a visual demo to show the angles in real time.',
+      'MindScribe on Pi 5 — AI system running on a standalone computer with no internet required. Hardware and software working together.'
+    ],
+    // Obj 6 — AI into robotic platforms
+    [
+      'MindScribe controls EleksDraw — the AI system produces the artwork and the robot draws it. One connected system from idea to physical output.',
+      'Webcam feeds back into the system — camera confirms the drawing is done and the AI logs the result. Vision and AI in the same loop.',
+      'Pi 5 with AI chip — a small computer with dedicated AI hardware running the whole system. Built to work without a server or cloud connection.'
+    ]
+  ],
+  ai: [
+    // Obj 1 — Create and integrate cognitive AI into applications
+    [
+      'MindScribe — AI system that profiles users through conversation and adapts its persona based on responses. Built with Claude API and LM Studio.',
+      'Bridge of Eternal Ascent — interactive experience that reads user word choices and adjusts its behavior in real time. Built for AI coursework.',
+      'Arb Scanner — rule-based decision system that reads live blockchain data and decides whether to execute a paper trade. Guided AI build.'
+    ],
+    // Obj 2 — Create and evolve natural language processing systems
+    [
+      'Bridge uses AFINN — a 2,477-word sentiment scoring list — to classify user input and route the experience. Real NLP, not hardcoded logic.',
+      'MindScribe routes conversation to different AI personas based on what the user says. The routing logic is applied language classification.',
+      'MindScribe prompt engineering — structured system prompts that control how each persona speaks, what it asks, and how it responds.'
+    ],
+    // Obj 3 — Machine learning systems using industry approaches
+    [
+      'Bridge uses an epsilon-greedy bandit — a standard ML algorithm used in recommendation systems. It learns which word types engage the user and adjusts.',
+      'Arb scanner paper trades generate a CSV log. Plan: train a simple classifier on that data to predict when opportunities are real vs noise.',
+      'LM Studio model comparison — tested Mistral, LLaMA, and Phi variants for MindScribe. Documented which worked and why.'
+    ],
+    // Obj 4 — Deep learning systems using best practices
+    [
+      'MindScribe uses Claude — a large language model — as its core engine. Prompt structure, context management, and persona tuning are the implementation layer.',
+      'Replicate API with Stable Diffusion XL for MindScribe sketch generation. Prompt engineering for Da Vinci-style line art output. Parameters tuned for plotter-ready SVG.',
+      'Classes in progress — evidence coming.'
+    ],
+    // Obj 5 — Neural networks and intelligent systems
+    [
+      'Worked directly with LLMs in LM Studio — tested temperature, context window, and sampling settings to understand how the model behavior changes.',
+      'Stable Diffusion image output — learned how prompt wording, negative prompts, and step count affect what the neural network generates.',
+      'Classes in progress — evidence coming.'
+    ],
+    // Obj 6 — RL, LLMs, and genetic algorithms
+    [
+      'Bridge bandit is reinforcement learning. User picks a word, system gets a reward signal, policy updates. Textbook RL in a working app.',
+      'MindScribe is built on top of an LLM. The entire system — personas, routing, session memory — is an LLM integration project.',
+      'Arb scanner auto-exec logic is the next candidate for an RL agent replacement. Plan documented, CSV data being collected.'
+    ]
+  ]
+};
+
+// track active obj and sub index per degree
+const state = { dmf:{obj:null,sub:0}, rob:{obj:null,sub:0}, ai:{obj:null,sub:0} };
+
+/* ── OVERLAY ── */
+function enterBoards() {
+  document.getElementById('splash').classList.add('hidden');
+}
+function goSplash() {
+  document.getElementById('splash').classList.remove('hidden');
+}
+
+/* ── DEGREE SWITCH ── */
+function sw(d) {
+  // hide all panels, show selected
+  DEGS.forEach(x => document.getElementById('panel-'+x).classList.remove('active'));
+  document.getElementById('panel-'+d).classList.add('active');
+  // update tab highlight color
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    t.classList.remove('ag','ao');
+    if (DEGS[i] === d) t.classList.add(DATA[d].col==='g' ? 'ag' : 'ao');
+  });
+  // shift tab bar accent color for AI (orange)
+  document.getElementById('tab-bar').classList.toggle('observe', d==='ai');
+}
+
+/* ── BUILD SIDE NAV CIRCLES ── */
+function buildNav(deg) {
+  const nav = document.getElementById('snav-'+deg);
+  nav.innerHTML = '';
+  DATA[deg].objs.forEach((_, i) => {
+    const b = document.createElement('button');
+    b.className = 'onum';
+    b.id = `onum-${deg}-${i}`;
+    b.textContent = i + 1;
+    b.title = 'Objective ' + (i+1);
+    b.onclick = () => selectObj(deg, i);
+    nav.appendChild(b);
+  });
+}
+
+/* ── SELECT OBJECTIVE — builds single obj view ── */
+function selectObj(deg, idx) {
+  const d      = DATA[deg];
+  const panel  = document.getElementById('opanel-'+deg);
+  const prefix = PREFIX[deg];
+
+  // reset sub index for this objective
+  state[deg].obj = idx;
+  state[deg].sub = 0;
+
+  // hide empty state prompt
+  document.getElementById('empty-'+deg).style.display = 'none';
+
+  // clear any previous obj view
+  panel.querySelectorAll('.obj-view').forEach(v => v.remove());
+
+  // color helpers
+  const colNum = d.col==='g' ? 'cg'      : 'co';
+  const colTxt = d.col==='g' ? 'cg-text' : 'co-text';
+  const colPip = d.col==='g' ? 'on-g'    : 'on-o';
+
+  // get default text for first sub (a)
+  const defaultText = SUBS_DEFAULT[deg][idx][0];
+
+  // build the view
+  const view = document.createElement('div');
+  view.className = 'obj-view active';
+  view.id = `oview-${deg}-${idx}`;
+  view.innerHTML = `
+    <div class="obj-header">
+      <div class="obj-header-num ${colNum}">${idx+1}</div>
+      <div class="obj-header-text">
+        <div class="obj-header-label">Objective ${idx+1}</div>
+        <div class="obj-header-body">${d.objs[idx]}</div>
+      </div>
+    </div>
+    <div class="sub-area">
+      <div class="stepper-bar">
+        <span class="stepper-label ${colTxt}" id="slabel-${deg}-${idx}">${prefix} ${idx+1}.${SUBS[0]}</span>
+        <div class="pip-row" id="pips-${deg}-${idx}">
+          ${SUBS.map((s,j) => `<div class="pip${j===0?' '+colPip:''}" id="pip-${deg}-${idx}-${j}"></div>`).join('')}
+        </div>
+        <button class="sarrow" id="sprev-${deg}-${idx}" onclick="stepSub('${deg}',${idx},-1)" disabled>&#9664;</button>
+        <button class="sarrow" id="snext-${deg}-${idx}" onclick="stepSub('${deg}',${idx},1)">&#9654;</button>
+      </div>
+      <div class="sub-box" id="sbox-${deg}-${idx}-0">${defaultText}</div>
+    </div>`;
+
+  panel.appendChild(view);
+  updNav(deg, idx);
+}
+
+/* ── STEP THROUGH SUBS a → b → c ── */
+function stepSub(deg, objIdx, dir) {
+  const max    = SUBS.length - 1;
+  const colTxt = DATA[deg].col==='g' ? 'cg-text' : 'co-text';
+  const colPip = DATA[deg].col==='g' ? 'on-g'    : 'on-o';
+  const prefix = PREFIX[deg];
+
+  // clamp sub index
+  state[deg].sub = Math.max(0, Math.min(max, state[deg].sub + dir));
+  const s = state[deg].sub;
+
+  // update label
+  document.getElementById(`slabel-${deg}-${objIdx}`).textContent = `${prefix} ${objIdx+1}.${SUBS[s]}`;
+
+  // update pip dots
+  SUBS.forEach((_,j) => {
+    document.getElementById(`pip-${deg}-${objIdx}-${j}`).className = 'pip' + (j===s ? ' '+colPip : '');
+  });
+
+  // swap sub box — use saved content or fall back to default descriptor
+  if (!window._subContent) window._subContent = {};
+  const area    = document.querySelector(`#oview-${deg}-${objIdx} .sub-area`);
+  const oldBox  = area.querySelector('.sub-box');
+  const prevKey = `${deg}-${objIdx}-${s - dir}`;
+  window._subContent[prevKey] = oldBox.innerHTML; // save what was showing
+
+  const newBox  = document.createElement('div');
+  newBox.className = 'sub-box';
+  newBox.id = `sbox-${deg}-${objIdx}-${s}`;
+  const savedKey = `${deg}-${objIdx}-${s}`;
+  // use saved content if exists, else use default descriptor
+  newBox.innerHTML = window._subContent[savedKey] || SUBS_DEFAULT[deg][objIdx][s];
+  oldBox.replaceWith(newBox);
+
+  // enable/disable arrows at ends
+  document.getElementById(`sprev-${deg}-${objIdx}`).disabled = (s === 0);
+  document.getElementById(`snext-${deg}-${objIdx}`).disabled = (s === max);
+}
+
+/* ── HIGHLIGHT ACTIVE CIRCLE IN SIDE NAV ── */
+function updNav(deg, activeIdx) {
+  document.querySelectorAll(`#snav-${deg} .onum`).forEach((b, i) => {
+    b.classList.remove('og','oo');
+    if (i === activeIdx) b.classList.add('o' + DATA[deg].col);
+  });
+}
+
+// build nav circles on page load
+DEGS.forEach(d => buildNav(d));
+
+/* ── HERO IMAGE SWAP INSTRUCTIONS ── */
+function heroClick(deg) {
+  alert('To swap: set background-image on .h-' + deg + ' in the CSS to your image URL.');
+}
+</script>
+</body>
+</html>
