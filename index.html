@@ -254,15 +254,28 @@ html, body { height: 100%; overflow: hidden; font-family: 'Syne', sans-serif; ba
 /* obj panel */
 .obj-panel { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
 
+/* empty state — instruction printed right next to the circles */
 .obj-empty {
   flex: 1; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 1rem;
+  align-items: flex-start; justify-content: flex-start;
+  padding-left: 2.5rem; padding-top: 1.1rem; gap: 0.4rem;
+}
+.obj-empty-arrow {
+  font-size: 1.8rem; color: #f5c800;
+  animation: nudge 1.2s ease-in-out infinite;
+}
+@keyframes nudge {
+  0%,100% { transform: translateX(0); }
+  50%      { transform: translateX(-8px); }
 }
 .obj-empty-hint {
-  font-family: 'DM Mono', monospace; font-size: 0.85rem;
-  letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink3);
+  font-family: 'DM Mono', monospace; font-size: 1rem;
+  letter-spacing: 0.1em; text-transform: uppercase; color: #f5c800;
 }
-.obj-empty-arrow { font-size: 1rem; color: var(--ink3); opacity: 0.4; }
+.obj-empty-sub {
+  font-family: 'DM Mono', monospace; font-size: 0.78rem;
+  color: var(--ink3); letter-spacing: 0.06em; margin-top: 0.2rem;
+}
 
 .obj-view { display: none; flex-direction: column; height: 100%; }
 .obj-view.active { display: flex; }
@@ -296,6 +309,14 @@ html, body { height: 100%; overflow: hidden; font-family: 'Syne', sans-serif; ba
   flex: 1; display: flex; flex-direction: column;
   padding: 1.5rem 2rem; overflow: hidden;
 }
+
+/* stepper hint sits inside the bar flush right with the arrows */
+.stepper-hint {
+  font-family: 'DM Mono', monospace; font-size: 0.72rem;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: #f5c800; flex-shrink: 0;
+}
+
 .stepper-bar {
   display: flex; align-items: center; gap: 1rem;
   margin-bottom: 1.2rem; flex-shrink: 0;
@@ -411,8 +432,9 @@ footer {
       <div class="side-nav" id="snav-dmf"></div>
       <div class="obj-panel" id="opanel-dmf">
         <div class="obj-empty" id="empty-dmf">
-          <span class="obj-empty-arrow">&#9664;</span>
+          <div class="obj-empty-arrow">&#9664;</div>
           <span class="obj-empty-hint">Select an objective</span>
+          <span class="obj-empty-sub">Use the numbered circles on the left</span>
         </div>
         <!-- obj views injected by JS -->
       </div>
@@ -429,8 +451,9 @@ footer {
       <div class="side-nav" id="snav-rob"></div>
       <div class="obj-panel" id="opanel-rob">
         <div class="obj-empty" id="empty-rob">
-          <span class="obj-empty-arrow">&#9664;</span>
+          <div class="obj-empty-arrow">&#9664;</div>
           <span class="obj-empty-hint">Select an objective</span>
+          <span class="obj-empty-sub">Use the numbered circles on the left</span>
         </div>
       </div>
     </div>
@@ -446,8 +469,9 @@ footer {
       <div class="side-nav" id="snav-ai"></div>
       <div class="obj-panel" id="opanel-ai">
         <div class="obj-empty" id="empty-ai">
-          <span class="obj-empty-arrow">&#9664;</span>
+          <div class="obj-empty-arrow">&#9664;</div>
           <span class="obj-empty-hint">Select an objective</span>
+          <span class="obj-empty-sub">Use the numbered circles on the left</span>
         </div>
       </div>
     </div>
@@ -703,6 +727,7 @@ function selectObj(deg, idx) {
         <div class="pip-row" id="pips-${deg}-${idx}">
           ${SUBS.map((s,j) => `<div class="pip${j===0?' '+colPip:''}" id="pip-${deg}-${idx}-${j}"></div>`).join('')}
         </div>
+        <span class="stepper-hint">step through &#9664; &#9654;</span>
         <button class="sarrow" id="sprev-${deg}-${idx}" onclick="stepSub('${deg}',${idx},-1)" disabled>&#9664;</button>
         <button class="sarrow" id="snext-${deg}-${idx}" onclick="stepSub('${deg}',${idx},1)">&#9654;</button>
       </div>
